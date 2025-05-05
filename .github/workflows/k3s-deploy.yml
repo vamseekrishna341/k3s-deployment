@@ -19,8 +19,11 @@ jobs:
       - name: Decode and write kubeconfig
         run: |
           echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > kubeconfig
-          export KUBECONFIG=$PWD/kubeconfig
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig
 
       - name: Deploy to K3s
         run: |
           kubectl apply -f nginx-deployment.yaml
+        env:
+          KUBECONFIG: ${{ github.workspace }}/kubeconfig
