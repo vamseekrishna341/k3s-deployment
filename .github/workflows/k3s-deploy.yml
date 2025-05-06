@@ -2,27 +2,24 @@ name: Deploy to K3s
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+    - name: Set up kubeconfig
+      run: |
+        echo "${{ secrets.KUBECONFIG_DATA }}" > kubeconfig
+        export KUBECONFIG=$PWD/kubeconfig
+        kubectl config get-contexts
 
-      - name: Decode and write kubeconfig
-        run: |
-          echo "${{ secrets.KUBE_CONFIG_DATA }}" | base64 -d > kubeconfig
-        env:
-          KUBECONFIG: ${{ github.workspace }}/kubeconfig
-
-      - name: Deploy to K3s
-        run: |
-          kubectl apply -f nginx-deployment.yaml --validate=false
+    - name: Deploy Nginx
+      run: |
+        export KUBECONFIG=$PWD/kubeconfig
+        kubectl apply -f nginx-deployment.yaml --validate=false
 
