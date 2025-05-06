@@ -14,7 +14,7 @@ jobs:
 
     - name: Set up kubeconfig
       run: |
-        echo "${{ secrets.KUBECONFIG_DATA }}" > kubeconfig
+        echo "${{ secrets.KUBECONFIG_BASE64 }}" | base64 -d > kubeconfig
         export KUBECONFIG=$PWD/kubeconfig
         kubectl config get-contexts
 
@@ -22,4 +22,3 @@ jobs:
       run: |
         export KUBECONFIG=$PWD/kubeconfig
         kubectl apply -f nginx-deployment.yaml --validate=false
-
